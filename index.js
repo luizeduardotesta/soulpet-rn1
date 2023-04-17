@@ -21,10 +21,21 @@ const Endereco = require("./database/endereco"); // configura o model endereço
 
 
 // Definição de rotas
-app.post("/clientes", (req, res) => {
-    const {nome, email, telefone} = req.body;
-    console.log(nome, email, telefone)
-    res.json("recebido!");
+app.post("/clientes", async (req, res) => {
+    // passos para adicionar:
+    // 1 - coletar informações do req.body
+    const {nome, email, telefone, endereco} = req.body;
+    
+    // 2 - chamar o model e a função create
+    try {
+        const novo = await Cliente.create(
+            {nome, email, telefone, endereco}, 
+            {include: [Endereco]} // permite inserir o endereço a um cliente
+        );
+        res.status(201).json(novo)
+    }catch (err) {
+        res.status(500).json({message: "Um erro aconteceu."})
+    }
 });
 
 

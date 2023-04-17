@@ -25,4 +25,11 @@ const Cliente = connection.define("cliente", {
     }
 });
 
+// Associação 1:1 (one-to-one)
+const Endereco = require("./endereco")
+
+Cliente.hasOne(Endereco);
+Endereco.belongsTo(Cliente);
+
+
 module.exports = Cliente;
