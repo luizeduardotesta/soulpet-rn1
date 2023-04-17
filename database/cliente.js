@@ -28,7 +28,11 @@ const Cliente = connection.define("cliente", {
 // Associação 1:1 (one-to-one)
 const Endereco = require("./endereco")
 
+// Cliente tem 1 endereço
+// Endereço ganha a chave estrangeira clienteId 
 Cliente.hasOne(Endereco);
+
+// Endereço pertence ao cliente
 Endereco.belongsTo(Cliente);
 
 

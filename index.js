@@ -21,6 +21,13 @@ const Endereco = require("./database/endereco"); // configura o model endereço
 
 
 // Definição de rotas
+app.get("/clientes", async (req, res) => {
+    // passos para listar:
+    // 1 - encontrar os clientes com findAll
+    const listaClientes = await Cliente.findAll();
+    res.json(listaClientes)
+});
+
 app.post("/clientes", async (req, res) => {
     // passos para adicionar:
     // 1 - coletar informações do req.body
@@ -34,6 +41,7 @@ app.post("/clientes", async (req, res) => {
         );
         res.status(201).json(novo)
     }catch (err) {
+        console.log(err);
         res.status(500).json({message: "Um erro aconteceu."})
     }
 });
@@ -43,6 +51,10 @@ app.post("/clientes", async (req, res) => {
 
 // Escuta de eventos (listener)
 app.listen(3000, () =>{
-    connection.sync({force: true}); // gerar tableas a partir do model
+    // gerar tableas a partir do model
+    // connection.sync();
+
+    // force : true = resetar dados da tabela
+    connection.sync({force: true}); 
     console.log("Servidor rodando em http://localhost:3000");
 });
