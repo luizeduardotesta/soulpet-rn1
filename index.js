@@ -22,18 +22,31 @@ const Endereco = require("./database/endereco"); // configura o model endereço
 
 // Definição de rotas
 app.get("/clientes", async (req, res) => {
-    // passos para listar:
-    // 1 - encontrar os clientes com findAll
+    // encontrar os clientes com findAll
     const listaClientes = await Cliente.findAll();
     res.json(listaClientes)
 });
 
+app.get("/clientes/:id", async (req, res) => {
+    // encontrar os clientes com findOne
+    const cliente = await Cliente.findOne({
+        where: {id: req.params.id}, 
+        include: [Endereco]
+    });
+
+    if(cliente){
+        res.json(cliente)
+    } else {
+        res.status(404).json({message: "Usuaário não encontrado"})
+    }
+});
+
+
 app.post("/clientes", async (req, res) => {
-    // passos para adicionar:
-    // 1 - coletar informações do req.body
+    // coletar informações do req.body
     const {nome, email, telefone, endereco} = req.body;
     
-    // 2 - chamar o model e a função create
+    // chamar o model e a função create
     try {
         const novo = await Cliente.create(
             {nome, email, telefone, endereco}, 
