@@ -136,7 +136,7 @@ app.post("/pets", async (req, res) => {
 
 // Filtrar todos os pets
 app.get("/pets", async (req, res) => {
-    // encontrar os clientes com findAll
+    // encontrar os pets com findAll
     const listaPets = await Pet.findAll();
     res.json(listaPets)
 });
@@ -151,7 +151,52 @@ app.get("/pets/:id", async (req, res) => {
     if (pet) {
         res.json(pet)
     } else {
-        res.status(404).json({ message: "Usuaário não encontrado" })
+        res.status(404).json({ message: "Pet não encontrado" })
+    }
+});
+
+// Atualizar um pet pelo id
+app.put("/pets/:id", async (req, res) => {
+    // coletar as insformações do body da requisição e o params.id
+    const { nome, tipo, porte, dataNasc } = req.body;
+    const { id } = req.params
+
+    try {
+        // busca pet pelo id
+        const pet = await Pet.findOne({ where: { id } });
+
+        // busca o pet no banco de dados
+        if (pet) {
+            // atualiza o pet no banco de dados
+            await pet.update({ nome, tipo, porte, dataNasc });
+            res.status(200).json({ message: "Informações atualizadas com sucesso!" })
+        } else {
+            res.status(404).json({ message: "Pet não encontrado." })
+        }
+
+    } catch (err) {
+        res.status(500).json({ message: "Um erro aconteceu." })
+    }
+
+});
+
+// Deletar um cliente pelo id
+app.delete("/pets/:id", async (req, res) => {
+    // Busca o pet pelo id
+    const { id } = req.params
+    const pet = await Pet.findOne({ where: { id } })
+
+    // Deleta o pet encontrado do banco de dados
+    try {
+        if (pet) {
+            await pet.destroy()
+            res.status(200).json({ message: "Pet deletado com sucesso!" })
+        } else {
+            res.status(404).json({ message: "Pet não encontrado." })
+        }
+
+    } catch (err) {
+        res.status(500).json({ message: "Um erro aconteceu." })
     }
 });
 
