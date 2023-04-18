@@ -16,12 +16,11 @@ const { connection, authenticate } = require("./database/database")
 authenticate(connection); // efetivar a conexão
 const Cliente = require("./database/cliente"); // configurar o model cliente
 const Endereco = require("./database/endereco"); // configura o model endereço
-
+const Pet = require("./database/pet"); // configurar o model pet
 
 
 
 // Definição de rotas
-
 // Filtrar todos os clientes
 app.get("/clientes", async (req, res) => {
     // encontrar os clientes com findAll

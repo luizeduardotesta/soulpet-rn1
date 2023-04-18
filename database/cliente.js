@@ -30,9 +30,8 @@ const Endereco = require("./endereco")
 
 // Cliente tem 1 endereço
 // Endereço ganha a chave estrangeira clienteId 
-Cliente.hasOne(Endereco);
-
 // Endereço pertence ao cliente
+Cliente.hasOne(Endereco);
 Endereco.belongsTo(Cliente);
 
 
