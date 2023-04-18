@@ -121,7 +121,7 @@ app.post("/pets", async (req, res) => {
 
     // chamar o model e a função create
     try {
-        const cliente = await Cliente.findByPk(clienteId)
+        const cliente = await Cliente.findOne({where: {id: clienteId}})
         if (cliente) {
             const novoPet = await Pet.create({ nome, tipo, porte, dataNasc, clienteId });
             res.status(201).json(novoPet)
@@ -131,6 +131,27 @@ app.post("/pets", async (req, res) => {
     } catch (err) {
         console.log(err);
         res.status(500).json({ message: "Um erro aconteceu." })
+    }
+});
+
+// Filtrar todos os pets
+app.get("/pets", async (req, res) => {
+    // encontrar os clientes com findAll
+    const listaPets = await Pet.findAll();
+    res.json(listaPets)
+});
+
+// Filtrar um unico pet pelo id
+app.get("/pets/:id", async (req, res) => {
+    // encontrar os pets com findOne
+    const pet = await Pet.findOne({
+        where: { id: req.params.id }
+    });
+
+    if (pet) {
+        res.json(pet)
+    } else {
+        res.status(404).json({ message: "Usuaário não encontrado" })
     }
 });
 
