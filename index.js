@@ -21,6 +21,8 @@ const Pet = require("./database/pet"); // configurar o model pet
 
 
 // Definição de rotas
+
+// CRUD Clientes
 // Filtrar todos os clientes
 app.get("/clientes", async (req, res) => {
     // encontrar os clientes com findAll
@@ -50,11 +52,11 @@ app.post("/clientes", async (req, res) => {
 
     // chamar o model e a função create
     try {
-        const novo = await Cliente.create(
+        const novoCliente = await Cliente.create(
             { nome, email, telefone, endereco },
-            { include: [Endereco] } // permite inserir o endereço a um cliente
+            { include: [Endereco] }, // permite inserir o endereço a um cliente
         );
-        res.status(201).json(novo)
+        res.status(201).json(novoCliente)
     } catch (err) {
         console.log(err);
         res.status(500).json({ message: "Um erro aconteceu." })
@@ -106,6 +108,25 @@ app.delete("/clientes/:id", async (req, res) => {
         }
 
     } catch (err) {
+        res.status(500).json({ message: "Um erro aconteceu." })
+    }
+});
+
+
+// CRUD Pets
+// Criar um pet
+app.post("/pets", async (req, res) => {
+    // coletar informações do req.body
+    const { nome, tipo, porte, dataNasc, clienteId } = req.body;
+
+    // chamar o model e a função create
+    try {
+        const novoPet = await Pet.create(
+            { nome, tipo, porte, dataNasc, clienteId }
+        );
+        res.status(201).json(novoPet)
+    } catch (err) {
+        console.log(err);
         res.status(500).json({ message: "Um erro aconteceu." })
     }
 });
