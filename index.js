@@ -121,10 +121,13 @@ app.post("/pets", async (req, res) => {
 
     // chamar o model e a função create
     try {
-        const novoPet = await Pet.create(
-            { nome, tipo, porte, dataNasc, clienteId }
-        );
-        res.status(201).json(novoPet)
+        const cliente = await Cliente.findByPk(clienteId)
+        if (cliente) {
+            const novoPet = await Pet.create({ nome, tipo, porte, dataNasc, clienteId });
+            res.status(201).json(novoPet)
+        } else {
+            res.status(404).json({ message: "Cliente não encontrado."})
+        }
     } catch (err) {
         console.log(err);
         res.status(500).json({ message: "Um erro aconteceu." })
