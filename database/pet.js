@@ -24,7 +24,7 @@ const Pet = connection.define("pet", {
     },
     dataNasc: {
         // dataNasc VARCHAR NOT NULL
-        type: DataTypes.DATE
+        type: DataTypes.DATEONLY
     }
 });
 
