@@ -59,7 +59,29 @@ app.post("/clientes", async (req, res) => {
     }
 });
 
+app.put("/clientes/:id", async (req, res) => {
+    // coletar as insformações do body da requisição e o params.id
+    const {nome, email, telefone, endereco} = req.body
+    const {id} = req.params
 
+    try {
+        const cliente = await Cliente.findOne({where: {id}});
+
+        if(cliente) {
+            if(endereco){
+                await Endereco.update(endereco, {where: {clienteId: id}});
+            }
+            await Cliente.update({nome, email, telefone}, {where: {id}}); 
+            res.status(200).json({message: "Informações atualizadas com sucesso!"})
+        } else {
+            res.status(404).json({message: "Cliente não encontrado."})
+        }
+
+    } catch (err) {
+        res.status(500).json({message: "Um erro aconteceu."})
+    }
+
+});
 
 
 // Escuta de eventos (listener)
@@ -67,7 +89,7 @@ app.listen(3000, () =>{
     // gerar tableas a partir do model
     // connection.sync();
 
-    // force : true = resetar dados da tabela
+    // force : true = resetar dados da tabela a cada atualização do codigo
     connection.sync({force: true}); 
     console.log("Servidor rodando em http://localhost:3000");
 });
