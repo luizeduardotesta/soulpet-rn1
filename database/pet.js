@@ -34,7 +34,8 @@ const Cliente = require("./cliente")
 // Cliente tem varios pets
 // Pet ganha a chave estrangeira clienteId 
 // Pet pertence ao cliente
-Cliente.hasMany(Pet);
+Cliente.hasMany(Pet, {onDelete: "CASCADE"});
+// Quando o cliente dor deletado todos os pets seram deletados tb
 Pet.belongsTo(Cliente);
 
 

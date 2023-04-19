@@ -1,212 +1,40 @@
-// biblioteca de variaveis de ambiente
+// Importação de biblioteca e variaveis de ambiente
 require("dotenv").config();
 const express = require("express");
+const morgan = require("morgan");
 
 
 
 // Configuração do App
 const app = express();
 app.use(express.json()); // possibilita transsitar dados usando json
-
+app.use(morgan("dev")); 
 
 
 
 // Configuração do Banco de Dados
 const { connection, authenticate } = require("./database/database")
 authenticate(connection); // efetivar a conexão
-const Cliente = require("./database/cliente"); // configurar o model cliente
-const Endereco = require("./database/endereco"); // configura o model endereço
-const Pet = require("./database/pet"); // configurar o model pet
+
 
 
 
 // Definição de rotas
+const rotasClientes = require("./routes/clientes");
+const rotasPets = require("./routes/pets");
 
-// CRUD Clientes
-// Filtrar todos os clientes
-app.get("/clientes", async (req, res) => {
-    // encontrar os clientes com findAll
-    const listaClientes = await Cliente.findAll();
-    res.json(listaClientes)
-});
-
-// Filtrar um unico cliente pelo id
-app.get("/clientes/:id", async (req, res) => {
-    // encontrar os clientes com findOne
-    const cliente = await Cliente.findOne({
-        where: { id: req.params.id },
-        include: [Endereco]
-    });
-
-    if (cliente) {
-        res.json(cliente)
-    } else {
-        res.status(404).json({ message: "Usuaário não encontrado" })
-    }
-});
-
-// Criar um cliente
-app.post("/clientes", async (req, res) => {
-    // coletar informações do req.body
-    const { nome, email, telefone, endereco } = req.body;
-
-    // chamar o model e a função create
-    try {
-        const novoCliente = await Cliente.create(
-            { nome, email, telefone, endereco },
-            { include: [Endereco] }, // permite inserir o endereço a um cliente
-        );
-        res.status(201).json(novoCliente)
-    } catch (err) {
-        console.log(err);
-        res.status(500).json({ message: "Um erro aconteceu." })
-    }
-});
-
-// Atualizar um cliente pelo id
-app.put("/clientes/:id", async (req, res) => {
-    // coletar as insformações do body da requisição e o params.id
-    const { nome, email, telefone, endereco } = req.body
-    const { id } = req.params
-
-    try {
-        // busca cliente pelo id
-        const cliente = await Cliente.findOne({ where: { id } });
-
-        // busca o cliente no banco de dados
-        if (cliente) {
-            //busca o endereço no banco de dados para atualizar
-            if (endereco) {
-                await Endereco.update(endereco, { where: { clienteId: id } });
-            }
-            // atualiza o cliente no banco de dados
-            await cliente.update({ nome, email, telefone });
-            res.status(200).json({ message: "Informações atualizadas com sucesso!" })
-        } else {
-            res.status(404).json({ message: "Cliente não encontrado." })
-        }
-
-    } catch (err) {
-        res.status(500).json({ message: "Um erro aconteceu." })
-    }
-
-});
-
-// Deletar um cliente pelo id
-app.delete("/clientes/:id", async (req, res) => {
-    // Busca o cliente pelo id
-    const { id } = req.params
-    const cliente = await Cliente.findOne({ where: { id } })
-
-    // Deleta o cliente encontrado do banco de dados
-    try {
-        if (cliente) {
-            await cliente.destroy()
-            res.status(200).json({ message: "Cliente deletado com sucesso!" })
-        } else {
-            res.status(404).json({ message: "Cliente não encontrado." })
-        }
-
-    } catch (err) {
-        res.status(500).json({ message: "Um erro aconteceu." })
-    }
-});
+app.use(rotasClientes);
+app.use(rotasPets);
 
 
-// CRUD Pets
-// Criar um pet
-app.post("/pets", async (req, res) => {
-    // coletar informações do req.body
-    const { nome, tipo, porte, dataNasc, clienteId } = req.body;
-
-    // chamar o model e a função create
-    try {
-        const cliente = await Cliente.findOne({where: {id: clienteId}})
-        if (cliente) {
-            const novoPet = await Pet.create({ nome, tipo, porte, dataNasc, clienteId });
-            res.status(201).json(novoPet)
-        } else {
-            res.status(404).json({ message: "Cliente não encontrado."})
-        }
-    } catch (err) {
-        console.log(err);
-        res.status(500).json({ message: "Um erro aconteceu." })
-    }
-});
-
-// Filtrar todos os pets
-app.get("/pets", async (req, res) => {
-    // encontrar os pets com findAll
-    const listaPets = await Pet.findAll();
-    res.json(listaPets)
-});
-
-// Filtrar um unico pet pelo id
-app.get("/pets/:id", async (req, res) => {
-    // encontrar os pets com findOne
-    const pet = await Pet.findOne({
-        where: { id: req.params.id }
-    });
-
-    if (pet) {
-        res.json(pet)
-    } else {
-        res.status(404).json({ message: "Pet não encontrado" })
-    }
-});
-
-// Atualizar um pet pelo id
-app.put("/pets/:id", async (req, res) => {
-    // coletar as insformações do body da requisição e o params.id
-    const { nome, tipo, porte, dataNasc } = req.body;
-    const { id } = req.params
-
-    try {
-        // busca pet pelo id
-        const pet = await Pet.findOne({ where: { id } });
-
-        // busca o pet no banco de dados
-        if (pet) {
-            // atualiza o pet no banco de dados
-            await pet.update({ nome, tipo, porte, dataNasc });
-            res.status(200).json({ message: "Informações atualizadas com sucesso!" })
-        } else {
-            res.status(404).json({ message: "Pet não encontrado." })
-        }
-
-    } catch (err) {
-        res.status(500).json({ message: "Um erro aconteceu." })
-    }
-
-});
-
-// Deletar um cliente pelo id
-app.delete("/pets/:id", async (req, res) => {
-    // Busca o pet pelo id
-    const { id } = req.params
-    const pet = await Pet.findOne({ where: { id } })
-
-    // Deleta o pet encontrado do banco de dados
-    try {
-        if (pet) {
-            await pet.destroy()
-            res.status(200).json({ message: "Pet deletado com sucesso!" })
-        } else {
-            res.status(404).json({ message: "Pet não encontrado." })
-        }
-
-    } catch (err) {
-        res.status(500).json({ message: "Um erro aconteceu." })
-    }
-});
 
 
 // Escuta de eventos (listener)
 app.listen(3000, () => {
     // gerar tableas a partir do model
-    // connection.sync();
+    connection.sync();
 
     // force : true = resetar dados da tabela a cada atualização do codigo
-    connection.sync({ force: true });
+    // connection.sync({ force: true });
     console.log("Servidor rodando em http://localhost:3000");
 });
