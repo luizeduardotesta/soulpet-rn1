@@ -2,8 +2,9 @@
 // mapeamento: cada propriedade vira uma coluna da tabela
 
 // Datatypes serve para definir o tipo da coluna
-const {DataTypes} = require("sequelize");
-const {connection} = require("./database")
+const { DataTypes } = require("sequelize");
+const { connection } = require("./database")
+const Cliente = require("./cliente")
 
 const Pet = connection.define("pet", {
     // configurar as colunas 'nome', tipo, porte e data de nascimento
@@ -29,12 +30,10 @@ const Pet = connection.define("pet", {
 });
 
 // Associação 1:N (one-to-many)
-const Cliente = require("./cliente")
-
 // Cliente tem varios pets
 // Pet ganha a chave estrangeira clienteId 
 // Pet pertence ao cliente
-Cliente.hasMany(Pet, {onDelete: "CASCADE"});
+Cliente.hasMany(Pet, { onDelete: "CASCADE" });
 // Quando o cliente dor deletado todos os pets seram deletados tb
 Pet.belongsTo(Cliente);
 

@@ -12,7 +12,7 @@ app.use(express.json()); // possibilita transsitar dados usando json
 app.use(morgan("dev"));
 
 // Configurações de acesso
-app.use(cors({ origin: "https://localhost:3000" }))
+app.use(cors({ origin: "http://localhost:3000" }));
 
 // Configuração do Banco de Dados
 const { connection, authenticate } = require("./database/database")
